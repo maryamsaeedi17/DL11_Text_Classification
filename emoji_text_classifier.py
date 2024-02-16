@@ -38,7 +38,7 @@ class EmojiTextClassifier():
 
         return self.words_vector
 
-    def sentence_to_feature_vectors_avg(self, sentence, dim, words_vector):
+    def sentence_to_feature_vectors_ave(self, sentence, dim, words_vector):
         sentence = sentence.lower()
         words = sentence.strip().split(" ")
 
@@ -55,17 +55,17 @@ class EmojiTextClassifier():
             tf.keras.layers.Dense(5, input_shape=(dim, ), activation="Softmax")
         ])
 
-        model.compile(
+        self.model.compile(
             optimizer=tf.keras.optimizers.Adam(),
             loss="categorical_crossentropy",
             metrics=["accuracy"]
         )
 
-    def train(self):
+    def train(self, dim, words_vector):
         X_train_ave = []
 
         for x_train in self.X_train:
-            X_train_ave.append(sentence_to_ave(x_train))
+            X_train_ave.append(self.sentence_to_feature_vectors_ave(x_train, dim, words_vector))
 
         X_train_ave = np.array(X_train_ave)
 
@@ -73,11 +73,11 @@ class EmojiTextClassifier():
 
         self.model.fit(X_train_ave, Y_train_one_hoted, epochs=200)
 
-    def test(self):
+    def test(self, dim, words_vector):
         X_test_ave = []
 
         for x_test in self.X_test:
-            X_test_ave.append(sentence_to_ave(x_test))
+            X_test_ave.append(self.sentence_to_feature_vectors_ave(x_test, dim, words_vector))
 
         X_test_ave = np.array(X_test_ave)
 
@@ -85,9 +85,9 @@ class EmojiTextClassifier():
         
         self.model.evaluate(X_test_ave, Y_test_one_hoted)
 
-    def predict(self, my_test_sentence):
-        test_ave = sentence_to_ave(my_test_sentence)
-        test_ave = np.array([my_test_ave])
+    def predict(self, my_test_sentence, dim, words_vector):
+        test_ave = self.sentence_to_feature_vectors_ave(my_test_sentence, dim, words_vector)
+        test_ave = np.array([test_ave])
         result = self.model.predict(test_ave)
         y_pred = np.argmax(result)
         return(self.label_to_emoji(y_pred))
