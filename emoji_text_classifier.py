@@ -52,6 +52,7 @@ class EmojiTextClassifier():
 
     def load_model(self, dim):
         self.model = tf.keras.models.Sequential([
+            tf.keras.layers.Dropout(0.2),
             tf.keras.layers.Dense(5, input_shape=(dim, ), activation="Softmax")
         ])
 
